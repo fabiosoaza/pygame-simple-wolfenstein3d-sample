@@ -13,7 +13,7 @@ class Player:
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
         dx, dy = 0, 0
-        # delta time is the amount the time that has passed since last fram
+        # delta time is the amount the time that has passed since last frame
         speed = PLAYER_SPEED * self.game.delta_time
         speed_sin = speed * sin_a
         speed_cos = speed * cos_a
