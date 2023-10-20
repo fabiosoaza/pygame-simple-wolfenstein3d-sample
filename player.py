@@ -13,10 +13,14 @@ class Player:
 
     def single_fire_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if event.button == 1 and not self.shot and not self.game.weapon.reloading:
-                self.game.sound.shotgun.play()
-                self.shot = True
-                self.game.weapon.reloading = True
+            if event.button == 1:
+                self.fire_single_shot()
+
+    def fire_single_shot(self):
+        if not self.shot and not self.game.weapon.reloading:
+            self.game.sound.shotgun.play()
+            self.shot = True
+            self.game.weapon.reloading = True
 
     def movement(self):
         sin_a = math.sin(self.angle)
@@ -49,6 +53,8 @@ class Player:
                 self.angle -= PLAYER_ROT_SPEED * self.game.delta_time
             if keys[pg.K_RIGHT]:
                 self.angle += PLAYER_ROT_SPEED * self.game.delta_time
+            if keys[pg.K_SPACE]:
+                self.fire_single_shot()
 
         # Normalize Keeping the angle within the range of 0 to 2 * pi (a full circle)
         self.angle %= math.tau
@@ -64,10 +70,11 @@ class Player:
             self.y += dy
 
     def draw(self):
-        pass
-        # pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
-        #              (self.x * 100 + WIDTH * math.cos(self.angle),
-        #               self.y * 100 + WIDTH * math.sin(self.angle)), 2)
+        if SIGHT_LINE is True:
+            pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
+                         (self.x * 100 + WIDTH * math.cos(self.angle),
+                          self.y * 100 + WIDTH * math.sin(self.angle)), 2)
+
         pg.draw.circle(self.game.screen, 'green', (self.x * 100, self.y * 100), 15)
 
     def mouse_control(self):

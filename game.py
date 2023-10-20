@@ -11,6 +11,7 @@ from object_handler import *
 from weapon import *
 from sound import *
 
+
 class Game:
     def __init__(self):
         pg.init()
@@ -20,6 +21,9 @@ class Game:
         self.clock = pg.time.Clock()
         self.delta_time = 1
         self.new_game()
+        self.global_trigger = False
+        self.global_event = pg.USEREVENT + 0
+        pg.time.set_timer(self.global_event, 40)
 
     def new_game(self):
         self.map = Map(self, MINI_MAP)
@@ -43,16 +47,21 @@ class Game:
 
     def draw(self):
         self.screen.fill('black')
-        self.object_renderer.draw()
-        self.weapon.draw()
-        # self.map.draw()
-        # self.player.draw()
+        if MODE_2D is False:
+            self.object_renderer.draw()
+            self.weapon.draw()
+        else:
+            self.map.draw()
+            self.player.draw()
 
     def check_events(self):
+        self.global_trigger = False
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 pg.quit()
                 sys.exit(0)
+            elif event.type == self.global_event:
+                self.global_trigger = True
             self.player.single_fire_event(event)
 
     def run(self):

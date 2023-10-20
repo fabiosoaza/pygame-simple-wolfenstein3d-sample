@@ -23,9 +23,9 @@ class RayCasting:
                 wall_column = pg.transform.scale(wall_column, (SCALE, proj_height))
                 wall_pos = (ray * SCALE, HALF_HEIGHT - proj_height // 2)
             else:
-                texture_height =  TEXTURE_SIZE * HEIGHT / proj_height
+                texture_height = TEXTURE_SIZE * HEIGHT / proj_height
                 wall_column = self.textures[texture].subsurface(
-                    offset * (TEXTURE_SIZE - SCALE), HALF_TEXTURE_SIZE-texture_height//2, SCALE, texture_height
+                    offset * (TEXTURE_SIZE - SCALE), HALF_TEXTURE_SIZE - texture_height // 2, SCALE, texture_height
                 )
                 wall_column = pg.transform.scale(wall_column, (SCALE, HEIGHT))
                 wall_pos = (ray * SCALE, 0)
@@ -87,10 +87,12 @@ class RayCasting:
                 offset = (1 - x_hor) if sin_a > 0 else x_hor
 
             # draw for debug
-            # pg.draw.line(self.game.screen, 'yellow', (100 * ox, 100 * oy),
-            #              (100 * ox + 100 * depth * cos_a, 100 * oy + 100 * depth * sin_a), 2
-            #
-            #              )
+            if MODE_2D is True:
+                pg.draw.line(self.game.screen, 'yellow', (100 * ox, 100 * oy),
+                             (100 * ox + 100 * depth * cos_a, 100 * oy + 100 * depth * sin_a), 2
+
+                             )
+
 
             depth *= math.cos(self.game.player.angle - ray_angle)
             proj_height = SCREEN_DIST / (depth + 0.0001)
