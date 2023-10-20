@@ -1,6 +1,7 @@
 from sprite_object import *
 from random import choices, randrange
 from npc import *
+import pygame as pg
 
 
 class ObjectHandler:
@@ -41,13 +42,36 @@ class ObjectHandler:
         add_sprite(AnimatedSprite(game, path=self.anim_sprite_path + 'green_light/0.png', pos=(1.5, 30.5)))
         add_sprite(AnimatedSprite(game, path=self.anim_sprite_path + 'green_light/0.png', pos=(1.5, 24.5)))
 
-        add_npc(NPC(game))
-        add_npc(NPC(game, pos=(11.5, 4.5)))
+        #add_npc(NPC(game))
+        #add_npc(NPC(game, pos=(11.5, 4.5)))
+        # spawn npc
+        self.enemies = ENEMIES_SPAWN_COUNT  # npc count
+        self.npc_types = [SoldierNPC, CacoDemonNPC, CyberDemonNPC]
+        self.weights = [70, 20, 10]
+        self.restricted_area = {(i, j) for i in range(10) for j in range(10)}
+        self.spawn_npc()
+
+
+    def spawn_npc(self):
+        for i in range(self.enemies):
+                npc = choices(self.npc_types, self.weights)[0]
+                pos = x, y = randrange(self.game.map.cols), randrange(self.game.map.rows)
+                while (pos in self.game.map.world_map) or (pos in self.restricted_area):
+                    pos = x, y = randrange(self.game.map.cols), randrange(self.game.map.rows)
+                self.add_npc(npc(self.game, pos=(x + 0.5, y + 0.5)))
+
+    def check_win(self):
+        if not len(self.npc_positions):
+            self.game.object_renderer.win()
+            pg.display.flip()
+            pg.time.delay(1500)
+            self.game.new_game()
 
     def update(self):
-        self.npc_positions = (npc.map_pos for npc in self.npc_list if npc.alive)
+        self.npc_positions = {npc.map_pos for npc in self.npc_list if npc.alive}
         [sprite.update() for sprite in self.sprite_list]
         [npc.update() for npc in self.npc_list]
+        self.check_win()
 
     def add_sprite(self, sprite):
         self.sprite_list.append(sprite)

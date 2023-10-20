@@ -10,6 +10,40 @@ class Player:
         self.angle = PLAYER_ANGLE
         self.rel = 0
         self.shot = False
+        self.health = PLAYER_MAX_HEALTH
+        # Im pussy mode
+        # Todo move this to a menu rookie
+        self.enabled_health_recovery = HEALTH_RECOVERY_ENABLED
+        self.health_recovery_delay = HEALTH_RECOVERY_DELAY
+        self.time_prev = pg.time.get_ticks()
+        # diagonal movement correction
+        self.diag_move_corr = 1 / math.sqrt(2)
+
+    def recover_health(self):
+        if self.enabled_health_recovery and self.check_health_recovery_delay() and self.health < PLAYER_MAX_HEALTH:
+            self.health += HEALTH_RECOVERY_AMOUNT
+            #clips health recovery
+            self.health =  min(PLAYER_MAX_HEALTH, self.health)
+
+    def check_health_recovery_delay(self):
+        time_now = pg.time.get_ticks()
+        if time_now - self.time_prev > self.health_recovery_delay:
+            self.time_prev = time_now
+            return True
+
+    def get_damage(self, damage):
+        self.health -= damage
+        self.health = max(0, self.health)
+        self.game.object_renderer.player_damage()
+        self.game.sound.player_pain.play()
+        self.check_game_over()
+
+    def check_game_over(self):
+        if self.health < 1:
+            self.game.object_renderer.game_over()
+            pg.display.flip()
+            pg.time.delay(1500)
+            self.game.new_game()
 
     def single_fire_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -32,18 +66,28 @@ class Player:
         speed_cos = speed * cos_a
 
         keys = pg.key.get_pressed()
+        num_key_pressed = -1
         if keys[pg.K_w]:
+            num_key_pressed += 1
             dx += speed_cos
             dy += speed_sin
         if keys[pg.K_s]:
+            num_key_pressed += 1
             dx += -speed_cos
             dy += -speed_sin
         if keys[pg.K_a]:
+            num_key_pressed += 1
             dx += speed_sin
             dy += -speed_cos
         if keys[pg.K_d]:
+            num_key_pressed += 1
             dx += - speed_sin
             dy += speed_cos
+
+            # diag move correction
+            if num_key_pressed:
+                dx *= self.diag_move_corr
+                dy *= self.diag_move_corr
 
         self.check_wall_collision(dx, dy)
 
@@ -90,6 +134,7 @@ class Player:
         self.movement()
         if MOUSE_ENABLED:
             self.mouse_control()
+        self.recover_health()
 
     @property
     def pos(self):
