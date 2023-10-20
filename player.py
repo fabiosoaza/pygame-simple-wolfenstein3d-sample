@@ -9,6 +9,14 @@ class Player:
         self.x, self.y = PLAYER_POS
         self.angle = PLAYER_ANGLE
         self.rel = 0
+        self.shot = False
+
+    def single_fire_event(self, event):
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 1 and not self.shot and not self.game.weapon.reloading:
+                self.game.sound.shotgun.play()
+                self.shot = True
+                self.game.weapon.reloading = True
 
     def movement(self):
         sin_a = math.sin(self.angle)
@@ -42,7 +50,6 @@ class Player:
             if keys[pg.K_RIGHT]:
                 self.angle += PLAYER_ROT_SPEED * self.game.delta_time
 
-
         # Normalize Keeping the angle within the range of 0 to 2 * pi (a full circle)
         self.angle %= math.tau
 
@@ -53,7 +60,7 @@ class Player:
         scale = PLAYER_SIZE_SCALE / self.game.delta_time
         if self.check_wall(int(self.x + dx * scale), int(self.y)):
             self.x += dx
-        if self.check_wall(int(self.x), int(self.y + dy*scale)):
+        if self.check_wall(int(self.x), int(self.y + dy * scale)):
             self.y += dy
 
     def draw(self):
@@ -74,7 +81,7 @@ class Player:
 
     def update(self):
         self.movement()
-        if  MOUSE_ENABLED:
+        if MOUSE_ENABLED:
             self.mouse_control()
 
     @property

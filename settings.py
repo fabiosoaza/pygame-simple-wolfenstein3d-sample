@@ -43,4 +43,5 @@ HALF_TEXTURE_SIZE = TEXTURE_SIZE //2
 
 TEXTURES_PATH='resources/textures'
 SPRITES_PATH='resources/sprites'
+SOUND_PATH='resources/sound'
 
